@@ -8,14 +8,19 @@
     body { font-family: 'Hiragino Sans', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
     .container { max-width: 400px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     h2 { text-align: center; color: #1a3a6b; font-size: 18px; margin-bottom: 20px; }
-    label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; color: #555; }
-    select, input[type="date"], input[type="number"], input[type="text"] { 
-      width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px;
+    label.title-label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; color: #555; margin-bottom: 5px;}
+    select, input[type="date"], input[type="text"] { 
+      width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px;
     }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 5px; }
-    .grid div { display: flex; align-items: center; justify-content: space-between; }
-    .grid label { margin: 0; font-weight: normal; font-size: 14px; }
-    .grid input { width: 60px; margin: 0; }
+    
+    /* 時間割チェックボックス用のデザイン */
+    .period-list { display: grid; gap: 8px; background: #f9f9f9; padding: 12px; border-radius: 8px; }
+    .period-item { display: flex; align-items: center; background: #fff; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .period-item:hover { background: #e8f4fd; border-color: #4A7CC4; }
+    .period-item input[type="checkbox"] { width: 20px; height: 20px; margin: 0; cursor: pointer; }
+    .period-item span { margin-left: 12px; font-weight: bold; font-size: 15px; cursor: pointer; flex-grow: 1;}
+    .period-item span.period-num { color: #888; font-size: 13px; font-weight: normal; margin-right: 8px; margin-left: 0; width: 30px; }
+
     button { 
       margin-top: 25px; width: 100%; padding: 15px; background: #1a3a6b; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
     }
@@ -28,12 +33,12 @@
   <h2>出欠入力フォーム</h2>
   <form id="attendanceForm">
     
-    <label>出席番号</label>
+    <label class="title-label">出席番号</label>
     <select id="studentNo" required>
       <option value="">-- 番号を選択 --</option>
-      </select>
+    </select>
 
-    <label>日付・曜日</label>
+    <label class="title-label">日付・曜日</label>
     <div style="display: flex; gap: 10px;">
       <input type="date" id="date" required style="flex: 2;">
       <select id="day" required style="flex: 1;">
@@ -42,7 +47,7 @@
       </select>
     </div>
 
-    <label>理由</label>
+    <label class="title-label">理由</label>
     <select id="reason" required>
       <option value="欠席">欠席</option>
       <option value="出席停止">出席停止</option>
@@ -53,27 +58,11 @@
       <option value="公欠">公欠</option>
     </select>
 
-    <label>欠課時数（該当科目のみ変更）</label>
-    <div class="grid">
-      <div><label>現代</label><input type="number" id="現代" min="0" value="0"></div>
-      <div><label>言語</label><input type="number" id="言語" min="0" value="0"></div>
-      <div><label>地理</label><input type="number" id="地理" min="0" value="0"></div>
-      <div><label>歴史</label><input type="number" id="歴史" min="0" value="0"></div>
-      <div><label>数I</label><input type="number" id="数I" min="0" value="0"></div>
-      <div><label>数A</label><input type="number" id="数A" min="0" value="0"></div>
-      <div><label>化学</label><input type="number" id="化学" min="0" value="0"></div>
-      <div><label>物</label><input type="number" id="物" min="0" value="0"></div>
-      <div><label>体育</label><input type="number" id="体育" min="0" value="0"></div>
-      <div><label>保健</label><input type="number" id="保健" min="0" value="0"></div>
-      <div><label>芸</label><input type="number" id="芸" min="0" value="0"></div>
-      <div><label>コミ</label><input type="number" id="コミ" min="0" value="0"></div>
-      <div><label>論</label><input type="number" id="論" min="0" value="0"></div>
-      <div><label>情</label><input type="number" id="情" min="0" value="0"></div>
-      <div><label>探求</label><input type="number" id="探求" min="0" value="0"></div>
-      <div><label>LHR</label><input type="number" id="LHR" min="0" value="0"></div>
-    </div>
+    <label class="title-label">欠課した授業（チェックを入れてください）</label>
+    <div id="period-container" class="period-list">
+      </div>
 
-    <label>備考</label>
+    <label class="title-label">備考</label>
     <input type="text" id="note" placeholder="例: 病院受診のため">
 
     <button type="submit" id="submitBtn">送信する</button>
@@ -81,7 +70,18 @@
 </div>
 
 <script>
-  // 1〜39番のプルダウン生成（個人情報を守るため番号のみ）
+  // ▼▼▼ 実際の時間割（重複もそのまま表現） ▼▼▼
+  const timetable = {
+    "月": ["現代", "化学", "コミ", "歴史", "体育", "情"],
+    "火": ["芸", "芸", "数A", "論", "現代", "数I", "LHR"],
+    "水": ["地理", "言語", "歴史", "数I", "数A", "探求", "探求"],
+    "木": ["言語", "化学", "情", "地理", "体育", "物"],
+    "金": ["コミ", "物", "論", "保健", "数I", "コミ"],
+    "土": [],
+    "日": []
+  };
+
+  // 1〜39番のプルダウン生成
   const selectNo = document.getElementById('studentNo');
   for(let i=1; i<=39; i++) {
     let opt = document.createElement('option');
@@ -90,49 +90,90 @@
     selectNo.appendChild(opt);
   }
 
-  // 日付と曜日を今日に自動セット
+  // 曜日ごとの時間割（チェックボックス）を生成する機能
+  function updateSubjectsDisplay() {
+    const day = document.getElementById('day').value;
+    const subjectsToday = timetable[day] || [];
+    const container = document.getElementById('period-container');
+    container.innerHTML = ''; // 一度リセット
+
+    if(subjectsToday.length === 0) {
+      container.innerHTML = '<div style="text-align: center; color: #999; padding: 10px;">授業がありません</div>';
+      return;
+    }
+
+    subjectsToday.forEach((subject, index) => {
+      const periodNum = index + 1; // 1限、2限...
+      
+      // labelで全体を囲むことで、行のどこをタップしてもチェックが入るようにする
+      const label = document.createElement('label');
+      label.className = 'period-item';
+      label.innerHTML = `
+        <span class="period-num">${periodNum}限</span>
+        <input type="checkbox" class="subject-checkbox" value="${subject}">
+        <span>${subject}</span>
+      `;
+      container.appendChild(label);
+    });
+  }
+
+  // 曜日が変更された時に表示を切り替える
+  document.getElementById('day').addEventListener('change', updateSubjectsDisplay);
+
+  // 日付と曜日を今日に自動セット＆初期表示
   const today = new Date();
   document.getElementById('date').valueAsDate = today;
   const days = ["日", "月", "火", "水", "木", "金", "土"];
   document.getElementById('day').value = days[today.getDay()];
+  updateSubjectsDisplay();
 
   // 送信処理
   document.getElementById('attendanceForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // 画面の再読み込みを防ぐ
+    e.preventDefault();
     
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = "送信中...";
 
-    // データの収集
+    // 各科目のチェックされた数を数える（初期値はすべて0）
+    const subjectCounts = {
+      現代: 0, 言語: 0, 地理: 0, 歴史: 0, 数I: 0, 数A: 0, 化学: 0, 物: 0, 体育: 0, 保健: 0, 芸: 0, コミ: 0, 論: 0, 情: 0, 探求: 0, LHR: 0
+    };
+
+    // チェックが入っている科目の数を1ずつ足す
+    document.querySelectorAll('.subject-checkbox:checked').forEach(cb => {
+      if(subjectCounts[cb.value] !== undefined) {
+        subjectCounts[cb.value]++;
+      }
+    });
+
     const data = {
       studentNo: document.getElementById('studentNo').value,
       date: document.getElementById('date').value.replace(/-/g, '/'),
       day: document.getElementById('day').value,
       reason: document.getElementById('reason').value,
-      現代: document.getElementById('現代').value,
-      言語: document.getElementById('言語').value,
-      地理: document.getElementById('地理').value,
-      歴史: document.getElementById('歴史').value,
-      数I: document.getElementById('数I').value,
-      数A: document.getElementById('数A').value,
-      化学: document.getElementById('化学').value,
-      物: document.getElementById('物').value,
-      体育: document.getElementById('体育').value,
-      保健: document.getElementById('保健').value,
-      芸: document.getElementById('芸').value,
-      コミ: document.getElementById('コミ').value,
-      論: document.getElementById('論').value,
-      情: document.getElementById('情').value,
-      探求: document.getElementById('探求').value,
-      LHR: document.getElementById('LHR').value,
+      現代: subjectCounts['現代'],
+      言語: subjectCounts['言語'],
+      地理: subjectCounts['地理'],
+      歴史: subjectCounts['歴史'],
+      数I: subjectCounts['数I'],
+      数A: subjectCounts['数A'],
+      化学: subjectCounts['化学'],
+      物: subjectCounts['物'],
+      体育: subjectCounts['体育'],
+      保健: subjectCounts['保健'],
+      芸: subjectCounts['芸'],
+      コミ: subjectCounts['コミ'],
+      論: subjectCounts['論'],
+      情: subjectCounts['情'],
+      探求: subjectCounts['探求'],
+      LHR: subjectCounts['LHR'],
       note: document.getElementById('note').value
     };
 
-    // 発行していただいた魔法のURL
+    // 発行していただいたURL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbykdj7kOS7oJ37k5wflOaluvrJjsoNLTDGbNzOz8c81xRAI8KUsvsDsNnuUXGwjjdI/exec";
 
-    // Googleへ送信（no-corsが最大のポイント！）
     fetch(WEB_APP_URL, {
       method: 'POST',
       mode: 'no-cors',
@@ -144,9 +185,9 @@
       btn.disabled = false;
       btn.textContent = "送信する";
       
-      // 連続で入力しやすいように一部をリセット
+      // リセット処理
       document.getElementById('studentNo').value = "";
-      document.querySelectorAll('.grid input').forEach(input => input.value = "0");
+      updateSubjectsDisplay(); // チェックボックスのチェックを外す
       document.getElementById('note').value = "";
     })
     .catch(err => {
