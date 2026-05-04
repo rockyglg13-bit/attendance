@@ -1,16 +1,11 @@
 
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="出欠入力">
-<title>出欠入力フォーム</title>
+<title>出欠入力（匿名版）</title>
 <style>
-/* デザイン設定 */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:#0f1117;color:#e8e8e8;min-height:100vh;padding:0 0 60px;}
 .wrap{max-width:500px;margin:0 auto;padding:12px 14px;}
@@ -20,52 +15,41 @@ body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:#0f1117;co
 .card{background:#1a1d27;border:1px solid #2a2d3a;border-radius:16px;padding:20px;margin-bottom:14px;}
 .card-label{font-size:10px;color:#6b7280;letter-spacing:2px;margin-bottom:16px;font-family:monospace;font-weight:700;}
 .field-label{font-size:12px;color:#9ca3af;display:block;margin-bottom:8px;font-weight:600;}
-.date-input{width:100%;background:#0f1117;border:2px solid #374151;border-radius:12px;padding:14px 16px;color:#e8e8e8;font-size:18px;font-weight:700;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none;}
-.date-input:focus{border-color:#4ade80;}
-.date-display, .name-display{margin-top:10px;padding:12px 16px;background:#0d2818;border:1px solid #166534;border-radius:12px;font-size:16px;font-weight:700;color:#4ade80;display:none;}
-.legend{display:flex;gap:12px;font-size:12px;color:#6b7280;margin-bottom:14px;flex-wrap:wrap;}
+.date-input{width:100%;background:#0f1117;border:2px solid #374151;border-radius:12px;padding:14px 16px;color:#e8e8e8;font-size:18px;font-weight:700;outline:none;font-family:inherit;}
+.date-display{margin-top:10px;padding:12px 16px;background:#0d2818;border:1px solid #166534;border-radius:12px;font-size:16px;font-weight:700;color:#4ade80;display:none;}
+.legend{display:flex;gap:12px;font-size:12px;color:#6b7280;margin-bottom:14px;}
 .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle;}
 .cnt-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
-.cnt-btn{width:44px;height:44px;border-radius:12px;border:1px solid #374151;background:#0f1117;color:#e8e8e8;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.cnt-btn{width:44px;height:44px;border-radius:12px;border:1px solid #374151;background:#0f1117;color:#e8e8e8;font-size:24px;cursor:pointer;}
 .cnt-val{font-size:20px;font-weight:800;color:#fff;min-width:30px;text-align:center;}
 .period-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.period-num{width:34px;height:34px;border-radius:8px;background:#374151;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#9ca3af;font-family:monospace;flex-shrink:0;}
-.subj-sel{flex:1;background:#0f1117;border:1px solid #374151;border-radius:10px;padding:10px 12px;color:#e8e8e8;font-size:15px;outline:none;font-family:inherit;-webkit-appearance:none;min-width:0;}
-.attend-btn{padding:10px 0;border-radius:10px;border:1px solid #374151;background:#0f1117;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;width:82px;text-align:center;flex-shrink:0;}
+.period-num{width:34px;height:34px;border-radius:8px;background:#374151;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#9ca3af;flex-shrink:0;}
+.subj-sel{flex:1;background:#0f1117;border:1px solid #374151;border-radius:10px;padding:10px 12px;color:#e8e8e8;font-size:15px;outline:none;}
+.attend-btn{padding:10px 0;border-radius:10px;border:1px solid #374151;background:#0f1117;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;width:82px;text-align:center;}
 .attend-btn.absent{border-color:#ef4444;background:#2d1515;color:#ef4444;}
 .attend-btn.none{border-color:#4b2d72;background:#1a1520;color:#a78bfa;}
 .reason-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
-.reason-btn{padding:12px 18px;border-radius:22px;border:1px solid #374151;background:#0f1117;color:#9ca3af;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+.reason-btn{padding:12px 18px;border-radius:22px;border:1px solid #374151;background:#0f1117;color:#9ca3af;font-size:14px;font-weight:600;cursor:pointer;}
 .reason-btn.active{border-color:#4ade80;background:#0d2818;color:#4ade80;}
-.note-input{width:100%;background:#0f1117;border:2px solid #374151;border-radius:12px;padding:14px 16px;color:#e8e8e8;font-size:16px;outline:none;font-family:inherit;}
-.output-box{background:#0f1117;border:1px solid #1f2937;border-radius:12px;padding:14px;font-size:11px;font-family:monospace;color:#6ee7b7;overflow-x:auto;white-space:pre;margin-bottom:14px;line-height:1.8;}
-.copy-btn{width:100%;padding:18px;border-radius:14px;border:none;background:#15803d;color:#fff;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;}
-.copy-btn:active{background:#166534;}
-.hint{margin-top:12px;padding:14px 16px;background:#0d2818;border:1px solid #166534;border-radius:12px;font-size:13px;color:#86efac;line-height:1.7;}
+.note-input{width:100%;background:#0f1117;border:2px solid #374151;border-radius:12px;padding:14px 16px;color:#e8e8e8;font-size:16px;outline:none;}
+.output-box{background:#0f1117;border:1px solid #1f2937;border-radius:12px;padding:14px;font-size:11px;font-family:monospace;color:#6ee7b7;white-space:pre;overflow-x:auto;line-height:1.8;}
+.copy-btn{width:100%;padding:18px;border-radius:14px;border:none;background:#15803d;color:#fff;font-size:17px;font-weight:800;cursor:pointer;margin-top:14px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="hdr">
-    <div class="hdr-sub">ATTENDANCE SYSTEM</div>
+    <div class="hdr-sub">SECURE SYSTEM</div>
     <div class="hdr-title">出欠入力フォーム</div>
   </div>
 
   <div class="card">
-    <div class="card-label">STEP 1 &nbsp;日付・生徒</div>
-    <label class="field-label">日付</label>
+    <div class="card-label">STEP 1 &nbsp;日付</div>
     <input type="date" id="dateInput" class="date-input" onchange="onDateChange()">
     <div id="dateDisplay" class="date-display"></div>
-    <label class="field-label" style="margin-top:16px">出席番号</label>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <button class="cnt-btn" onclick="changeNo(-1)">−</button>
-      <input type="number" id="noInput" class="date-input" style="text-align:center;font-size:28px;font-weight:800;width:100px;flex-shrink:0;" min="1" max="39" placeholder="－" inputmode="numeric" oninput="onNoChange()">
-      <button class="cnt-btn" onclick="changeNo(1)">＋</button>
-    </div>
-    <div id="nameDisplay" class="name-display"></div>
   </div>
 
-  <div id="timetableCard" class="card" style="display:none">
+  <div id="timetableCard" class="card">
     <div class="card-label">STEP 2 &nbsp;時間割・出欠</div>
     <div class="legend">
       <span><span class="dot" style="background:#374151"></span>参加</span>
@@ -81,72 +65,57 @@ body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;background:#0f1117;co
     <div id="periodList"></div>
   </div>
 
-  <div id="reasonCard" class="card" style="display:none">
+  <div class="card">
     <div class="card-label">STEP 3 &nbsp;理由・備考</div>
     <label class="field-label">区分</label>
     <div class="reason-wrap" id="reasonBtns"></div>
     <label class="field-label" style="margin-top:10px;">備考（任意）</label>
-    <input type="text" id="noteInput" class="note-input" placeholder="例: 模試、体育祭 など" oninput="updateOutput()">
+    <input type="text" id="noteInput" class="note-input" placeholder="例: 通院、模試など" oninput="updateOutput()">
   </div>
 
   <div id="outputCard" class="card" style="display:none">
     <div class="card-label">OUTPUT (TSV)</div>
     <div id="outputBox" class="output-box"></div>
-    <button class="copy-btn" id="copyBtn" onclick="doCopy()">クリップボードにコピー</button>
-    <div id="copyHint" class="hint" style="display:none">📋 スプレッドシートの <strong>A列</strong> を選択してペーストしてください。</div>
+    <button class="copy-btn" onclick="doCopy()">コピーする</button>
   </div>
 </div>
 
 <script>
-// 生徒リスト
-var STUDENTS=[[1,'芥 伊純'],[2,'石川 瑠唯'],[3,'伊藤 正義'],[4,'植松 莉菜'],[5,'牛窪 杏梨'],[6,'宇都 彩葉'],[7,'遠藤 央祐'],[8,'太田 栞'],[9,'岡本 創'],[10,'加藤 すず'],[11,'金子 恵琳'],[12,'樺山 玲美'],[13,'苅部 良'],[14,'工藤 幸希'],[15,'倉田 美桜'],[16,'坂本 陽菜'],[17,'佐藤 聖純'],[18,'島津 立'],[19,'新宮 悠空'],[20,'鈴木 惇也'],[21,'銭 美希'],[22,'田山 聖来'],[23,'槻舘 可奈'],[24,'中澤 勇明'],[25,'長橋 瀬奈'],[26,'中村 知世'],[27,'中山 歩翔'],[28,'長谷川 樹'],[29,'福田 蒼太'],[30,'福本 秀太'],[31,'藤原 幸柚'],[32,'星野 実紗希'],[33,'真中 杏依'],[34,'宮﨑 偉'],[35,'宮村 龍'],[36,'村澤 徹哉'],[37,'吉野 みやび'],[38,'渡部 颯太'],[39,'渡部 菜緒']];
-var SUBJECTS=['現代','言語','地理','歴史','数I','数A','化学','物','体育','保健','芸','コミ','論','情','探求','LHR'];
-var DAYS=['日','月','火','水','木','金','土'];
-var TT={月:{1:'現代',2:'化学',3:'コミ',4:'歴史',5:'体育',6:'情'},火:{1:'芸',2:'芸',3:'数A',4:'論',5:'現代',6:'数I',7:'LHR'},水:{1:'地理',2:'言語',3:'歴史',4:'数I',5:'数A',6:'探求',7:'探求'},木:{1:'言語',2:'化学',3:'情',4:'地理',5:'体育',6:'物'},金:{1:'コミ',2:'物',3:'論',4:'保健',5:'数I',6:'コミ'}};
-var REASONS=['出席','欠席','出席停止','遅刻','早退','保健室','その他'];
-
+const SUBJECTS=['現代','言語','地理','歴史','数I','数A','化学','物','体育','保健','芸','コミ','論','情','探求','LHR'];
+const DAYS=['日','月','火','水','木','金','土'];
+const TT={
+  月:{1:'現代',2:'化学',3:'コミ',4:'歴史',5:'体育',6:'情'},
+  火:{1:'芸',2:'芸',3:'数A',4:'論',5:'現代',6:'数I',7:'LHR'},
+  水:{1:'地理',2:'言語',3:'歴史',4:'数I',5:'数A',6:'探求',7:'探求'},
+  木:{1:'言語',2:'化学',3:'情',4:'地理',5:'体育',6:'物'},
+  金:{1:'コミ',2:'物',3:'論',4:'保健',5:'数I',6:'コミ'}
+};
+const REASONS=['出席','欠席','遅刻','早退','保健室','その他'];
 var periodCount=6, periodData={}, reason='出席', selectedDow='';
 
 window.onload = function(){
   var today=new Date();
-  var yyyy=today.getFullYear(), mm=String(today.getMonth()+1).padStart(2,'0'), dd=String(today.getDate()).padStart(2,'0');
-  document.getElementById('dateInput').value=yyyy+'-'+mm+'-'+dd;
+  document.getElementById('dateInput').value=today.toISOString().split('T')[0];
   onDateChange();
 };
 
 function onDateChange(){
   var val=document.getElementById('dateInput').value;
-  if(!val)return;
   var d=new Date(val.replace(/-/g,'/')+' 00:00:00');
   selectedDow=DAYS[d.getDay()];
   document.getElementById('dateDisplay').textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+selectedDow+'）';
   document.getElementById('dateDisplay').style.display='block';
-  periodData={};
   var tt=TT[selectedDow]||{};
   periodCount=Object.keys(tt).length||6;
   document.getElementById('periodVal').textContent=periodCount;
+  periodData={};
   for(var p=1;p<=8;p++) periodData[p]={subj:tt[p]||'',state:tt[p]?0:2};
   renderTimetable(); updateReasonSection(); updateOutput();
-}
-
-function changeNo(d){
-  var inp=document.getElementById('noInput');
-  var next=Math.min(39,Math.max(1,(parseInt(inp.value)||0)+d));
-  inp.value=next; onNoChange();
-}
-
-function onNoChange(){
-  var no=parseInt(document.getElementById('noInput').value), s=null;
-  for(var i=0;i<STUDENTS.length;i++) if(STUDENTS[i][0]===no){ s=STUDENTS[i]; break; }
-  var el=document.getElementById('nameDisplay');
-  if(s){ el.textContent=no+'番：'+s[1]; el.style.display='block'; } else el.style.display='none';
-  updateOutput();
 }
 
 function changePeriod(d){
   var n=periodCount+d; if(n<1||n>8)return;
   periodCount=n; document.getElementById('periodVal').textContent=n;
-  for(var p=1;p<=periodCount;p++) if(!periodData[p]) periodData[p]={subj:'',state:0};
   renderTimetable(); updateOutput();
 }
 
@@ -156,48 +125,38 @@ function renderTimetable(){
     var d=periodData[p]||(periodData[p]={subj:'',state:0});
     var btnCls='attend-btn'+(d.state===1?' absent':d.state===2?' none':'');
     var btnLabel=d.state===0?'○参加':d.state===1?'×不参加':'―なし';
-    var opts='<option value="">科目</option>'+SUBJECTS.map(function(s){return '<option value="'+s+'"'+(d.subj===s?' selected':'')+'>'+s+'</option>';}).join('');
-    html+='<div class="period-row"><div class="period-num">'+p+'</div><select class="subj-sel" onchange="setSubj('+p+',this.value)">'+opts+'</select><button class="'+btnCls+'" onclick="cycleState('+p+')">'+btnLabel+'</button></div>';
+    var opts='<option value="">科目</option>'+SUBJECTS.map(s=>`<option value="${s}" ${d.subj===s?'selected':''}>${s}</option>`).join('');
+    html+=`<div class="period-row"><div class="period-num">${p}</div><select class="subj-sel" onchange="periodData[${p}].subj=this.value;updateOutput()">${opts}</select><button class="${btnCls}" onclick="cycleState(${p})">${btnLabel}</button></div>`;
   }
   document.getElementById('periodList').innerHTML=html;
-  document.getElementById('timetableCard').style.display='block';
-  document.getElementById('reasonCard').style.display='block';
 }
-
-function setSubj(p,v){ periodData[p].subj=v; updateOutput(); }
 
 function cycleState(p){
   periodData[p].state=(periodData[p].state+1)%3;
-  var hasAbs=false; for(var k in periodData) if(periodData[k].state===1) hasAbs=true;
-  if(hasAbs && reason==='出席') reason='欠席'; // 不参加があれば自動で欠席に
-  renderTimetable(); updateReasonSection(); updateOutput();
+  renderTimetable(); updateOutput();
 }
 
 function updateReasonSection(){
-  var html=REASONS.map(function(r){return '<button class="reason-btn'+(r===reason?' active':'')+'" onclick="setReason(\''+r+'\')">'+r+'</button>';}).join('');
-  document.getElementById('reasonBtns').innerHTML=html;
+  document.getElementById('reasonBtns').innerHTML=REASONS.map(r=>`<button class="reason-btn ${r===reason?'active':''}" onclick="reason='${r}';updateReasonSection();updateOutput()">${r}</button>`).join('');
 }
 
-function setReason(r){ reason=r; updateReasonSection(); updateOutput(); }
-
 function updateOutput(){
-  var no=document.getElementById('noInput').value, dateVal=document.getElementById('dateInput').value;
-  if(!dateVal||!no){ document.getElementById('outputCard').style.display='none'; return; }
-  var d=new Date(dateVal.replace(/-/g,'/')+' 00:00:00'), dateStr=d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate();
-  var note=document.getElementById('noteInput').value, counts={};
-  SUBJECTS.forEach(function(s){counts[s]=0;});
-  for(var p=1;p<=periodCount;p++){ var pd=periodData[p]; if(pd&&pd.state===1&&pd.subj) counts[pd.subj]++; }
-  var row=[reason,dateStr,selectedDow].concat(SUBJECTS.map(function(s){return counts[s]||0;})).concat([note]);
+  var dateVal=document.getElementById('dateInput').value;
+  if(!dateVal){document.getElementById('outputCard').style.display='none';return;}
+  var d=new Date(dateVal.replace(/-/g,'/')+' 00:00:00');
+  var counts={}; SUBJECTS.forEach(s=>counts[s]=0);
+  for(var p=1;p<=periodCount;p++) if(periodData[p].state===1 && periodData[p].subj) counts[periodData[p].subj]++;
+  var row=[reason,`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`,selectedDow].concat(SUBJECTS.map(s=>counts[s])).concat([document.getElementById('noteInput').value]);
   document.getElementById('outputBox').textContent=row.join(' | ');
   document.getElementById('outputCard').dataset.tsv=row.join('\t');
   document.getElementById('outputCard').style.display='block';
 }
 
 function doCopy(){
-  var text=document.getElementById('outputCard').dataset.tsv||'', btn=document.getElementById('copyBtn');
-  var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); btn.textContent='✓ コピーしました！'; document.getElementById('copyHint').style.display='block'; }catch(e){}
-  document.body.removeChild(ta);
+  var t=document.getElementById('outputCard').dataset.tsv;
+  var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+  alert('コピーしました。スプレッドシートの該当行に貼り付けてください。');
 }
 </script>
 </body>
