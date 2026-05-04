@@ -70,7 +70,7 @@
 </div>
 
 <script>
-  // ▼▼▼ 実際の時間割（重複もそのまま表現） ▼▼▼
+  // 時間割データ
   const timetable = {
     "月": ["現代", "化学", "コミ", "歴史", "体育", "情"],
     "火": ["芸", "芸", "数A", "論", "現代", "数I", "LHR"],
@@ -95,7 +95,7 @@
     const day = document.getElementById('day').value;
     const subjectsToday = timetable[day] || [];
     const container = document.getElementById('period-container');
-    container.innerHTML = ''; // 一度リセット
+    container.innerHTML = ''; 
 
     if(subjectsToday.length === 0) {
       container.innerHTML = '<div style="text-align: center; color: #999; padding: 10px;">授業がありません</div>';
@@ -103,9 +103,7 @@
     }
 
     subjectsToday.forEach((subject, index) => {
-      const periodNum = index + 1; // 1限、2限...
-      
-      // labelで全体を囲むことで、行のどこをタップしてもチェックが入るようにする
+      const periodNum = index + 1;
       const label = document.createElement('label');
       label.className = 'period-item';
       label.innerHTML = `
@@ -117,14 +115,24 @@
     });
   }
 
-  // 曜日が変更された時に表示を切り替える
+  // 手動で曜日を変更した時も表示を切り替える
   document.getElementById('day').addEventListener('change', updateSubjectsDisplay);
+
+  // ★★★ 今回追加した新機能：日付を変えたら曜日も自動で変える ★★★
+  const daysArray = ["日", "月", "火", "水", "木", "金", "土"];
+  document.getElementById('date').addEventListener('change', function() {
+    const selectedDate = new Date(this.value);
+    if (!isNaN(selectedDate.getTime())) { // 正しい日付が入力されているか確認
+      const dayIndex = selectedDate.getDay(); // 0(日)〜6(土)の数字を取得
+      document.getElementById('day').value = daysArray[dayIndex]; // 曜日プルダウンを変更
+      updateSubjectsDisplay(); // 時間割の表示も新しく更新
+    }
+  });
 
   // 日付と曜日を今日に自動セット＆初期表示
   const today = new Date();
   document.getElementById('date').valueAsDate = today;
-  const days = ["日", "月", "火", "水", "木", "金", "土"];
-  document.getElementById('day').value = days[today.getDay()];
+  document.getElementById('day').value = daysArray[today.getDay()];
   updateSubjectsDisplay();
 
   // 送信処理
@@ -135,12 +143,10 @@
     btn.disabled = true;
     btn.textContent = "送信中...";
 
-    // 各科目のチェックされた数を数える（初期値はすべて0）
     const subjectCounts = {
       現代: 0, 言語: 0, 地理: 0, 歴史: 0, 数I: 0, 数A: 0, 化学: 0, 物: 0, 体育: 0, 保健: 0, 芸: 0, コミ: 0, 論: 0, 情: 0, 探求: 0, LHR: 0
     };
 
-    // チェックが入っている科目の数を1ずつ足す
     document.querySelectorAll('.subject-checkbox:checked').forEach(cb => {
       if(subjectCounts[cb.value] !== undefined) {
         subjectCounts[cb.value]++;
@@ -171,7 +177,6 @@
       note: document.getElementById('note').value
     };
 
-    // 発行していただいたURL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbykdj7kOS7oJ37k5wflOaluvrJjsoNLTDGbNzOz8c81xRAI8KUsvsDsNnuUXGwjjdI/exec";
 
     fetch(WEB_APP_URL, {
@@ -185,9 +190,8 @@
       btn.disabled = false;
       btn.textContent = "送信する";
       
-      // リセット処理
       document.getElementById('studentNo').value = "";
-      updateSubjectsDisplay(); // チェックボックスのチェックを外す
+      updateSubjectsDisplay();
       document.getElementById('note').value = "";
     })
     .catch(err => {
